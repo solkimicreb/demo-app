@@ -1,7 +1,5 @@
 import React, { Component } from 'react'
 import { observer } from 'mobx-react'
-import DatePicker from 'react-datepicker'
-import moment from 'moment'
 
 @observer
 export default class ContactFilter extends Component {
