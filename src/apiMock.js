@@ -10,7 +10,6 @@ export function getContact (id) {
 }
 
 export function createContact (contact) {
-  console.log('createContact')
   const id = idCounter++
   contact.id = id
   contacts[id] = contact
