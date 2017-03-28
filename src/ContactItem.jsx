@@ -34,6 +34,7 @@ export default class ContactRow extends Component {
         <td>{contact.lastName}</td>
         <td>{contact.email}</td>
         <td>{contact.phone}</td>
+        <td>{contact.createdAt}</td>
         <td><button onClick={editContact}>Edit</button></td>
         <td><button onClick={undoContactEdit} disabled={!contact.history.length}>Undo</button></td>
         <td><button onClick={deleteContact}>X</button></td>

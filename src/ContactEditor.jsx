@@ -53,6 +53,9 @@ export default class ContactEditor extends Component {
           onChange={modifyContact} placeholder="Phone number"/>
         </td>
         <td>
+          { contact.createdAt || (new Date()).toISOString() }
+        </td>
+        <td>
           <button onClick={saveContact}>Save</button>
         </td>
         <td>

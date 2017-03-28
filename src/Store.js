@@ -8,7 +8,8 @@ const sampleContact = {
   firstName: '',
   lastName: '',
   email: '',
-  phone: ''
+  phone: '',
+  createdAt: undefined
 }
 
 export default class AppStore {
@@ -17,10 +18,12 @@ export default class AppStore {
   @observable order = 'desc'
   @observable fromDate = Date.now() - ONE_DAY
   @observable toDate = Date.now()
+  @observable error = undefined
 
   constructor () {
     api.getContacts(this.fromDate, this.toDate, this.orderBy, this.order)
       .then(contacts => this.contacts = contacts.map(dataToContact))
+      .catch(error => this.setError(error))
   }
 
   @action.bound addContact () {
@@ -35,24 +38,29 @@ export default class AppStore {
         const index = this.contacts.findIndex(item => item.id === contact.id)
         this.contacts.splice(index, 1)
       })
+      .catch(error => this.setError(error))
   }
 
   @action.bound saveContact (contact) {
     const data = contactToData(contact)
     if (contact.id === undefined) {
       api.createContact(data)
-        .then((created) => Object.assign(contact, created))
+        .then(created => Object.assign(contact, created))
+        .then(() => contact.editing = false)
+        .catch(error => this.setError(error))
     } else {
       api.updateContact(data)
+        .then(() => contact.editing = false)
+        .catch(error => this.setError(error))
     }
-    contact.editing = false
   }
 
   @action.bound undoContactEdit (contact) {
     const historyItem = contact.history.pop()
     if (historyItem) {
-      Object.assign(contact, historyItem)
       api.updateContact(historyItem)
+        .then(() => Object.assign(contact, historyItem))
+        .catch(error => this.setError(error))
     }
     contact.editing = false
   }
@@ -76,13 +84,24 @@ export default class AppStore {
     }
     api.getContacts(this.fromDate, this.toDate, this.orderBy, this.order)
       .then(contacts => this.contacts = contacts.map(dataToContact))
+      .catch(error => this.setError(error))
+  }
+
+  @action.bound setDate (name, value) {
+    this[name] = value
   }
 
   @action.bound filterContacts () {
     const fromDate = this.fromDate || Date.now()
     const toDate = this.toDate || (Date.now() - ONE_DAY)
-    /*api.getContacts(fromDate, toDate)
-      .then(contacts => this.contacts = contacts.map(dataToContact))*/
+    api.getContacts(fromDate, toDate)
+      .then(contacts => this.contacts = contacts.map(dataToContact))
+      .catch(error => this.setError(error))
+  }
+
+  @action.bound setError (error) {
+    this.error = error
+    setTimeout(() => this.error = undefined, 3000)
   }
 }
 

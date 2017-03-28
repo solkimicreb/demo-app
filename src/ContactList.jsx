@@ -2,18 +2,19 @@ import React, { Component } from 'react'
 import { observer } from 'mobx-react'
 import ContactItem from './ContactItem'
 import ContactEditor from './ContactEditor'
+import ContactFilter from './ContactFilter'
+import ErrorDisplay from './ErrorDisplay'
 
 @observer
 export default class Contacts extends Component {
   render () {
     const { store } = this.props
-    const { contacts, orderBy, addContact, sortContacts, filterContacts } = store
+    const { contacts, error, orderBy, addContact, sortContacts, filterContacts } = store
 
     return (
       <div>
         <h2>Contacts</h2>
-        <input name="firstName" onChange={filterContacts} placeholder="First name" />
-        <input name="lastName" onChange={filterContacts} placeholder="Last name" />
+        <ContactFilter store={store} />
 
         <table>
           <thead>
@@ -26,6 +27,8 @@ export default class Contacts extends Component {
                 className={orderBy === 'email' ? 'active' : undefined}>Email</th>
               <th onClick={() => sortContacts('phone')}
                 className={orderBy === 'phone' ? 'active' : undefined}>Phone</th>
+              <th onClick={() => sortContacts('createdAt')}
+                className={orderBy === 'createdAt' ? 'active' : undefined}>Created</th>
             </tr>
           </thead>
           <tbody>
@@ -35,6 +38,7 @@ export default class Contacts extends Component {
           </tbody>
         </table>
         <button onClick={addContact}>Add Contact</button>
+        <ErrorDisplay error={error}/>
       </div>
     )
   }

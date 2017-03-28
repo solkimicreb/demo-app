@@ -42,8 +42,11 @@ export function updateContact (contact) {
 }
 
 function checkError (resp) {
-  if (400 <= resp.status) {
-    throw new Error(`Errors: ${resp.json()}`)
+  if (!resp.ok) {
+    return resp.text()
+      .then(text => {
+        throw text
+      })
   }
   return resp
 }
