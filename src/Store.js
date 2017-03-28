@@ -1,56 +1,62 @@
 import { observable, action, toJS } from 'mobx'
 import * as api from './api'
 
-let counter = 0
+let fakeIdCounter = 0
+const ONE_DAY = 24 * 3600 * 1000
+
+const sampleContact = {
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: ''
+}
 
 export default class AppStore {
-  @observable contacts = [dataToContact({
-    first_name: 'Miklos',
-    last_name: 'Bertalan',
-    email: 'miklos.bertalan@risingstack.com',
-    phone: '+3630-821-7872',
-    id: 0
-  }), dataToContact({
-    first_name: 'Zsoldos',
-    last_name: 'Vanda',
-    email: 'zsoldos.vanda@gmail.com',
-    phone: '+3630-671-8345',
-    id: 1
-  })]
-  @observable.ref allContacts = []
-  @observable sortBy = 'first_name'
+  @observable contacts = []
+  @observable sortBy = 'firstName'
+  @observable fromDate = Date.now() - ONE_DAY
+  @observable toDate = Date.now()
+
+  constructor () {
+    api.getContacts(this.fromDate, this.toDate)
+      .then(contacts => this.contacts = contacts.map(dataToContact))
+  }
 
   @action.bound addContact () {
-    const data = {
-      first_name: '',
-      last_name: '',
-      email: '',
-      phone: '',
-      id: counter++
-    }
-    const contact = dataToContact(data, true)
+    const contact = dataToContact(sampleContact, true)
     this.contacts.push(contact)
   }
 
   @action.bound deleteContact (contact) {
-    const index = this.contacts.findIndex(item => item.id === contact.id)
-    this.contacts.splice(index, 1)
+    api.deleteContact(contact)
+      .then(() => {
+        const index = this.contacts.findIndex(item => item.id === contact.id)
+        this.contacts.splice(index, 1)
+      })
   }
 
   @action.bound saveContact (contact) {
+    const data = contactToData(contact)
+    if (contact.id === undefined) {
+      api.createContact(data)
+    } else {
+      api.updateContact(data)
+    }
     contact.editing = false
   }
 
   @action.bound undoContactEdit (contact) {
     const historyItem = contact.history.pop()
     if (historyItem) {
-      Object.assign(contact, historyItem)
+      api.updateContact(historyItem)
+        .then(updated => Object.assign(contact, updated))
     }
     contact.editing = false
   }
 
   @action.bound editContact (contact) {
-    addHistoryItem(contact)
+    const data = contactToData(contact)
+    contact.history.push(data)
     contact.editing = true
   }
 
@@ -67,33 +73,26 @@ export default class AppStore {
     this.sortBy = sortBy
   }
 
-  @action.bound filterContacts (ev) {
-    const filterKey = ev.target.name
-    const filterValue = ev.target.value
-    if (filterValue) {
-      this.allContacts = this.contacts
-      this.contacts = this.contacts.filter(contact => contact[filterKey].includes(filterValue))
-    } else {
-      this.contacts = this.allContacts
-    }
+  @action.bound filterContacts () {
+    const fromDate = this.fromDate || Date.now()
+    const toDate = this.toDate || (Date.now() - ONE_DAY)
+    api.getContacts(fromDate, toDate)
+      .then(contacts => this.contacts = contacts.map(dataToContact))
   }
-}
-
-function addHistoryItem (contact) {
-  const data = contactToData(contact)
-  contact.history.push(data)
 }
 
 function contactToData (contact) {
   const data = Object.assign({}, contact)
   delete data.history
   delete data.editing
+  delete data.fakeId
   return data
 }
 
 function dataToContact (data, editing) {
-  return Object.assign({}, data, { id: counter++, history: [data], editing })
+  const contact = Object.assign({}, data, { history: [data], editing })
+  if (contact.id === undefined) {
+    contact.fakeId = `fake_${fakeIdCounter++}`
+  }
+  return contact
 }
-
-api.getContacts()
-  .then(console.log)

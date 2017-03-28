@@ -37,11 +37,11 @@ export default class ContactEditor extends Component {
     return (
       <tr>
         <td>
-          <input name="first_name" value={contact.first_name}
+          <input name="firstName" value={contact.firstName}
             onChange={modifyContact} placeholder="First name"/>
         </td>
         <td>
-        <input name="last_name" value={contact.last_name}
+        <input name="lastName" value={contact.lastName}
           onChange={modifyContact} placeholder="Last name"/>
         </td>
         <td>
@@ -56,7 +56,7 @@ export default class ContactEditor extends Component {
           <button onClick={saveContact}>Save</button>
         </td>
         <td>
-          <button onClick={undoContactEdit}>Undo</button>
+          <button onClick={undoContactEdit} disabled={!contact.history.length}>Undo</button>
         </td>
         <td>
           <button onClick={deleteContact}>X</button>

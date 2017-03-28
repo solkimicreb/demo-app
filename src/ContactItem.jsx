@@ -30,12 +30,12 @@ export default class ContactRow extends Component {
     const { contact } = this.props
     return (
       <tr>
-        <td>{contact.first_name}</td>
-        <td>{contact.last_name}</td>
+        <td>{contact.firstName}</td>
+        <td>{contact.lastName}</td>
         <td>{contact.email}</td>
         <td>{contact.phone}</td>
         <td><button onClick={editContact}>Edit</button></td>
-        <td><button onClick={undoContactEdit}>Undo</button></td>
+        <td><button onClick={undoContactEdit} disabled={!contact.history.length}>Undo</button></td>
         <td><button onClick={deleteContact}>X</button></td>
       </tr>
     )

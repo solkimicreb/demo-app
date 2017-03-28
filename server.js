@@ -1,15 +1,17 @@
-var webpack = require('webpack');
-var WebpackDevServer = require('webpack-dev-server');
-var config = require('./webpack.config');
+'use strict'
 
-new WebpackDevServer(webpack(config), {
-  publicPath: config.output.publicPath,
+const webpack = require('webpack')
+const WebpackDevServer = require('webpack-dev-server')
+const webpackConfig = require('./webpack.config')
+const config = require('./config')
+
+new WebpackDevServer(webpack(webpackConfig), {
+  publicPath: webpackConfig.output.publicPath,
   hot: true,
   historyApiFallback: true
-}).listen(3000, 'localhost', function (err, result) {
+}).listen(config.port, 'localhost', (err, result) => {
   if (err) {
-    console.log(err);
+    console.log(err)
   }
-
-  console.log('Listening at localhost:3000');
-});
+  console.log(`Listening at localhost:${config.port}`)
+})

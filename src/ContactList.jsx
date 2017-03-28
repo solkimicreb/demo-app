@@ -12,16 +12,16 @@ export default class Contacts extends Component {
     return (
       <div>
         <h2>Contacts</h2>
-        <input name="first_name" onChange={filterContacts} placeholder="First name" />
-        <input name="last_name" onChange={filterContacts} placeholder="Last name" />
+        <input name="firstName" onChange={filterContacts} placeholder="First name" />
+        <input name="lastName" onChange={filterContacts} placeholder="Last name" />
 
         <table>
           <thead>
             <tr>
-              <th onClick={() => sortContacts('first_name')}
-                className={sortBy === 'first_name' ? 'active' : undefined}>Firstname</th>
-              <th onClick={() => sortContacts('last_name')}
-                className={sortBy === 'last_name' ? 'active' : undefined}>Lastname</th>
+              <th onClick={() => sortContacts('firstName')}
+                className={sortBy === 'firstName' ? 'active' : undefined}>Firstname</th>
+              <th onClick={() => sortContacts('lastName')}
+                className={sortBy === 'lastName' ? 'active' : undefined}>Lastname</th>
               <th onClick={() => sortContacts('email')}
                 className={sortBy === 'email' ? 'active' : undefined}>Email</th>
               <th onClick={() => sortContacts('phone')}
@@ -30,8 +30,8 @@ export default class Contacts extends Component {
           </thead>
           <tbody>
             {contacts.map(contact => contact.editing
-              ? <ContactEditor key={contact.id} contact={contact} store={store} />
-              : <ContactItem key={contact.id} contact={contact} store={store} />)}
+              ? <ContactEditor key={contact.id || contact.fakeId} contact={contact} store={store} />
+              : <ContactItem key={contact.id || contact.fakeId} contact={contact} store={store} />)}
           </tbody>
         </table>
         <button onClick={addContact}>Add Contact</button>

@@ -1,11 +1,14 @@
-var path = require('path');
-var webpack = require('webpack');
+'use strict'
+
+const path = require('path')
+const webpack = require('webpack')
+const config = require('./config')
 
 module.exports = {
   devtool: 'eval',
   entry: [
     'react-hot-loader/patch',
-    'webpack-dev-server/client?http://localhost:3000',
+    `webpack-dev-server/client?http://localhost:${config.port}`,
     'webpack/hot/only-dev-server',
     './src/index'
   ],
