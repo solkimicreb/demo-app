@@ -7,7 +7,7 @@ import ContactEditor from './ContactEditor'
 export default class Contacts extends Component {
   render () {
     const { store } = this.props
-    const { contacts, sortBy, addContact, sortContacts, filterContacts } = store
+    const { contacts, orderBy, addContact, sortContacts, filterContacts } = store
 
     return (
       <div>
@@ -19,13 +19,13 @@ export default class Contacts extends Component {
           <thead>
             <tr>
               <th onClick={() => sortContacts('firstName')}
-                className={sortBy === 'firstName' ? 'active' : undefined}>Firstname</th>
+                className={orderBy === 'firstName' ? 'active' : undefined}>First name</th>
               <th onClick={() => sortContacts('lastName')}
-                className={sortBy === 'lastName' ? 'active' : undefined}>Lastname</th>
+                className={orderBy === 'lastName' ? 'active' : undefined}>Last name</th>
               <th onClick={() => sortContacts('email')}
-                className={sortBy === 'email' ? 'active' : undefined}>Email</th>
+                className={orderBy === 'email' ? 'active' : undefined}>Email</th>
               <th onClick={() => sortContacts('phone')}
-                className={sortBy === 'phone' ? 'active' : undefined}>Phone</th>
+                className={orderBy === 'phone' ? 'active' : undefined}>Phone</th>
             </tr>
           </thead>
           <tbody>

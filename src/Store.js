@@ -13,17 +13,19 @@ const sampleContact = {
 
 export default class AppStore {
   @observable contacts = []
-  @observable sortBy = 'firstName'
+  @observable orderBy = 'firstName'
+  @observable order = 'desc'
   @observable fromDate = Date.now() - ONE_DAY
   @observable toDate = Date.now()
 
   constructor () {
-    api.getContacts(this.fromDate, this.toDate)
+    api.getContacts(this.fromDate, this.toDate, this.orderBy, this.order)
       .then(contacts => this.contacts = contacts.map(dataToContact))
   }
 
   @action.bound addContact () {
-    const contact = dataToContact(sampleContact, true)
+    const contact = dataToContact(sampleContact)
+    contact.editing = true
     this.contacts.push(contact)
   }
 
@@ -39,6 +41,7 @@ export default class AppStore {
     const data = contactToData(contact)
     if (contact.id === undefined) {
       api.createContact(data)
+        .then((created) => Object.assign(contact, created))
     } else {
       api.updateContact(data)
     }
@@ -48,8 +51,8 @@ export default class AppStore {
   @action.bound undoContactEdit (contact) {
     const historyItem = contact.history.pop()
     if (historyItem) {
+      Object.assign(contact, historyItem)
       api.updateContact(historyItem)
-        .then(updated => Object.assign(contact, updated))
     }
     contact.editing = false
   }
@@ -64,20 +67,22 @@ export default class AppStore {
     contact[ev.target.name] = ev.target.value
   }
 
-  @action.bound sortContacts (sortBy) {
-    if (this.sortBy === sortBy) {
-      this.contacts = this.contacts.reverse()
+  @action.bound sortContacts (orderBy) {
+    if (this.orderBy === orderBy) {
+      this.order = (this.order === 'asc') ? 'desc' : 'asc'
     } else {
-      this.contacts = this.contacts.sort((a, b) => a[sortBy].localeCompare(b[sortBy]))
+      this.orderBy = orderBy
+      this.order = 'desc'
     }
-    this.sortBy = sortBy
+    api.getContacts(this.fromDate, this.toDate, this.orderBy, this.order)
+      .then(contacts => this.contacts = contacts.map(dataToContact))
   }
 
   @action.bound filterContacts () {
     const fromDate = this.fromDate || Date.now()
     const toDate = this.toDate || (Date.now() - ONE_DAY)
-    api.getContacts(fromDate, toDate)
-      .then(contacts => this.contacts = contacts.map(dataToContact))
+    /*api.getContacts(fromDate, toDate)
+      .then(contacts => this.contacts = contacts.map(dataToContact))*/
   }
 }
 
@@ -89,8 +94,8 @@ function contactToData (contact) {
   return data
 }
 
-function dataToContact (data, editing) {
-  const contact = Object.assign({}, data, { history: [data], editing })
+function dataToContact (data) {
+  const contact = Object.assign({}, data, { history: [], editing: false })
   if (contact.id === undefined) {
     contact.fakeId = `fake_${fakeIdCounter++}`
   }

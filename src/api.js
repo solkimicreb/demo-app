@@ -1,8 +1,4 @@
 import 'whatwg-fetch'
-// import io from 'socket.io-client'
-
-/*const socket = io('http://localhost:3000')
-socket.on('connection', client => { console.log('connected', client ) })*/
 
 const API_URL = 'http://localhost:3000/api/v1'
 const headers = {
@@ -11,29 +7,47 @@ const headers = {
   'authorized-request': true
 }
 
-export function getContacts (fromDate, toDate) {
-  return fetch(`${API_URL}/contact?fromDate=${fromDate}&toDate=${toDate}`, { headers })
-    .then(resp => resp.json())
+const socket = new Primus()
+socket.on('data', (data) => console.log(data))
+socket.on('connection', () => console.log('connected'))
+
+export function getContacts (fromDate, toDate, orderBy, order) {
+  return fetch(`${API_URL}/contact?fromDate=${fromDate}&toDate=${toDate}&orderBy=${orderBy}&order=${order}`, { headers })
+    .then(checkError)
+    .then(toJSON)
 }
 
 export function getContact (id) {
   return fetch(`${API_URL}/contact/${id}`, { headers })
-    .then(resp => resp.json())
+    .then(checkError)
+    .then(toJSON)
 }
 
 export function createContact (contact) {
   const body = JSON.stringify(contact)
   return fetch(`${API_URL}/contact`, { method: 'POST', body, headers })
-    .then(resp => resp.json())
+    .then(checkError)
+    .then(toJSON)
 }
 
-export function deleteContact (id) {
-  return fetch(`${API_URL}/contact/${id}`, { method: 'DELETE', headers })
-    .then(resp => resp.json())
+export function deleteContact (contact) {
+  return fetch(`${API_URL}/contact/${contact.id}`, { method: 'DELETE', headers })
+    .then(checkError)
 }
 
 export function updateContact (contact) {
   const body = JSON.stringify(contact)
   return fetch(`${API_URL}/contact/${contact.id}`, { method: 'PATCH', body, headers })
-    .then(resp => resp.json())
+    .then(checkError)
+}
+
+function checkError (resp) {
+  if (400 <= resp.status) {
+    throw new Error(`Errors: ${resp.json()}`)
+  }
+  return resp
+}
+
+function toJSON (resp) {
+  return resp.json()
 }
