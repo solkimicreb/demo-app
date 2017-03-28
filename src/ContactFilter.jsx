@@ -41,5 +41,6 @@ function formatDate (date) {
   const hours = ('0' + (date.getHours() + 1)).slice(-2)
   const day = ('0' + date.getDate()).slice(-2)
   const month = ('0' + (date.getMonth() + 1)).slice(-2)
+  console.log(date, `${date.getFullYear()}-${month}-${day}T${hours}:${minutes}:${seconds}`)
   return `${date.getFullYear()}-${month}-${day}T${hours}:${minutes}:${seconds}`
 }

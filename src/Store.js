@@ -94,7 +94,7 @@ export default class AppStore {
   @action.bound filterContacts () {
     const fromDate = this.fromDate || Date.now()
     const toDate = this.toDate || (Date.now() - ONE_DAY)
-    api.getContacts(fromDate, toDate)
+    api.getContacts(fromDate, toDate, this.orderBy, this.order)
       .then(contacts => this.contacts = contacts.map(dataToContact))
       .catch(error => this.setError(error))
   }
