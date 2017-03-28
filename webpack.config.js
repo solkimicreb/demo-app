@@ -21,10 +21,17 @@ module.exports = {
     extensions: ['', '.js', '.jsx']
   },
   module: {
-    loaders: [{
-      test: /\.jsx?$/,
-      loaders: ['babel'],
-      include: path.join(__dirname, 'src')
-    }]
+    loaders: [
+      {
+        test: /\.jsx?$/,
+        loaders: ['babel'],
+        include: path.join(__dirname, 'src')
+      },
+      {
+        test: /\.less?$/,
+        loaders: ['style-loader', 'css-loader', 'less-loader'],
+        include: path.join(__dirname, 'src')
+      }
+    ]
   }
-};
+}
